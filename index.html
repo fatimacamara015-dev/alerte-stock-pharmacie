@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerte Stock Pharmacie</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7f6;
+      color: #1f2a24;
+      margin: 0;
+      padding: 24px 16px;
+    }
+    main {
+      max-width: 560px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin: 0 0 4px;
+      color: #0b6e4f;
+    }
+    p {
+      margin: 0 0 20px;
+      color: #5b6b63;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.05rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 8px;
+      border-bottom: 1px solid #e3e8e5;
+    }
+    th {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #5b6b63;
+    }
+    td.quantite, th.quantite {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr.stock-bas td {
+      color: #c0392b;
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fdecea;
+      color: #c0392b;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Stock de la pharmacie</h1>
+    <p>Quantités actuellement disponibles</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Médicament</th>
+          <th class="quantite">Quantité en stock</th>
+        </tr>
+      </thead>
+      <tbody id="liste-stock"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const medicaments = [
+      { nom: "Paracétamol 500 mg", quantite: 120 },
+      { nom: "Amoxicilline 500 mg", quantite: 6 },
+      { nom: "Artéméther-Luméfantrine (antipaludique)", quantite: 3 },
+      { nom: "Sels de réhydratation orale (SRO)", quantite: 80 },
+      { nom: "Ibuprofène 400 mg", quantite: 60 }
+    ];
+
+    const SEUIL_STOCK_BAS = 10; // en nombre de boîtes
+
+    const tbody = document.getElementById("liste-stock");
+    medicaments.forEach(function (med) {
+      const ligne = document.createElement("tr");
+      const stockBas = med.quantite < SEUIL_STOCK_BAS;
+      if (stockBas) {
+        ligne.className = "stock-bas";
+      }
+      ligne.innerHTML =
+        "<td>" + med.nom +
+          (stockBas ? '<span class="badge">Stock bas</span>' : "") +
+        "</td>" +
+        '<td class="quantite">' + med.quantite + "</td>";
+      tbody.appendChild(ligne);
+    });
+  </script>
+</body>
+</html>
