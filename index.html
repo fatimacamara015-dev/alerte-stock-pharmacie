@@ -66,6 +66,59 @@
       font-size: 0.8rem;
       font-weight: 600;
     }
+    form {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #e3e8e5;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin: 0 0 12px;
+      color: #1f2a24;
+    }
+    .champs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: #5b6b63;
+    }
+    label:first-child {
+      flex: 1 1 200px;
+    }
+    label:nth-child(2) {
+      width: 100px;
+    }
+    input {
+      font: inherit;
+      padding: 8px 10px;
+      border: 1px solid #c9d2cd;
+      border-radius: 8px;
+      color: #1f2a24;
+    }
+    input:focus-visible {
+      outline: 2px solid #0b6e4f;
+      outline-offset: 1px;
+    }
+    button {
+      font: inherit;
+      font-weight: 600;
+      padding: 9px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #0b6e4f;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #095a41;
+    }
   </style>
 </head>
 <body>
@@ -82,6 +135,21 @@
       </thead>
       <tbody id="liste-stock"></tbody>
     </table>
+
+    <form id="formulaire-ajout">
+      <h2>Ajouter un médicament</h2>
+      <div class="champs">
+        <label>
+          Nom
+          <input type="text" id="nom" required placeholder="Ex. Métronidazole 250 mg">
+        </label>
+        <label>
+          Quantité
+          <input type="number" id="quantite" required min="0" step="1" placeholder="0">
+        </label>
+        <button type="submit">Ajouter</button>
+      </div>
+    </form>
   </main>
 
   <script>
@@ -96,18 +164,53 @@
     const SEUIL_STOCK_BAS = 10; // en nombre de boîtes
 
     const tbody = document.getElementById("liste-stock");
-    medicaments.forEach(function (med) {
+
+    function afficherMedicament(med) {
       const ligne = document.createElement("tr");
       const stockBas = med.quantite < SEUIL_STOCK_BAS;
       if (stockBas) {
         ligne.className = "stock-bas";
       }
-      ligne.innerHTML =
-        "<td>" + med.nom +
-          (stockBas ? '<span class="badge">Stock bas</span>' : "") +
-        "</td>" +
-        '<td class="quantite">' + med.quantite + "</td>";
+
+      const celluleNom = document.createElement("td");
+      celluleNom.textContent = med.nom; // textContent : pas d'injection HTML
+      if (stockBas) {
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = "Stock bas";
+        celluleNom.appendChild(badge);
+      }
+
+      const celluleQuantite = document.createElement("td");
+      celluleQuantite.className = "quantite";
+      celluleQuantite.textContent = med.quantite;
+
+      ligne.appendChild(celluleNom);
+      ligne.appendChild(celluleQuantite);
       tbody.appendChild(ligne);
+    }
+
+    medicaments.forEach(afficherMedicament);
+
+    const formulaire = document.getElementById("formulaire-ajout");
+    const champNom = document.getElementById("nom");
+    const champQuantite = document.getElementById("quantite");
+
+    formulaire.addEventListener("submit", function (evenement) {
+      evenement.preventDefault();
+
+      const nom = champNom.value.trim();
+      const quantite = parseInt(champQuantite.value, 10);
+      if (nom === "" || isNaN(quantite) || quantite < 0) {
+        return;
+      }
+
+      const med = { nom: nom, quantite: quantite };
+      medicaments.push(med);
+      afficherMedicament(med);
+
+      formulaire.reset();
+      champNom.focus();
     });
   </script>
 </body>
